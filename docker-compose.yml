@@ -36,4 +36,4 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
-    command: ["gateway", "run"]
+    command: ["sleep", "infinity"]

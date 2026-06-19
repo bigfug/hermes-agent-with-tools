@@ -1,0 +1,39 @@
+services:
+  hermes:
+    image: ghcr.io/bigfug/hermes-agent-with-tools:latest
+    container_name: hermes
+    restart: unless-stopped
+
+    ports:
+      - "8642:8642"
+      - "9119:9119"
+
+    volumes:
+      - /volume1/docker/hermes:/opt/data
+
+    environment:
+      - HERMES_DASHBOARD=1
+      - HERMES_DASHBOARD_INSECURE=1
+      - HERMES_DASHBOARD_TUI=1
+      - HERMES_DASHBOARD_SESSION_TOKEN=${HERMES_DASHBOARD_SESSION_TOKEN}
+
+      - API_SERVER_ENABLED=true
+      - API_SERVER_HOST=0.0.0.0
+      - API_SERVER_KEY=${API_SERVER_KEY}
+      - API_SERVER_CORS_ORIGINS=*
+
+      - HERMES_TELEGRAM_POLL_TIMEOUT=1
+      - HERMES_TELEGRAM_POLL_INTERVAL=1
+
+      - FIRECRAWL_API_KEY=${FIRECRAWL_API_KEY}
+      - EXA_API_KEY=${EXA_API_KEY}
+
+      - PUID=1033
+      - PGID=100
+
+      - HERMES_DISABLE_LAZY_INSTALLS=1
+
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+    command: ["gateway", "run"]

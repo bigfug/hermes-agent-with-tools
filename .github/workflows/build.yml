@@ -1,34 +1,73 @@
-# .github/workflows/build.yml
-name: Build Hermes Custom Image
+name: Build and push custom Hermes image
 
 on:
-  workflow_dispatch:
   schedule:
-    - cron: "15 2 * * 1"
+    - cron: '0 6 * * *'   # daily at 06:00 UTC; adjust as you like
+  workflow_dispatch: {}     # manual "Run workflow" button
+  push:
+    branches: [main]
+    paths:
+      - 'Dockerfile'
+      - '.github/workflows/build.yml'
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
-  build:
+  check-and-build:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      packages: write
-
     steps:
-      - name: Check out repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Log in to GitHub Container Registry
+      - name: Get upstream digest
+        id: upstream
+        run: |
+          docker pull nousresearch/hermes-agent:latest
+          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' nousresearch/hermes-agent:latest)
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+
+      - name: Restore last built digest
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: .last-digest
+          key: last-digest-${{ github.run_id }}
+          restore-keys: last-digest-
+
+      - name: Compare digests
+        id: compare
+        run: |
+          LAST=""
+          if [ -f .last-digest ]; then LAST=$(cat .last-digest); fi
+          echo "Upstream: ${{ steps.upstream.outputs.digest }}"
+          echo "Last built: $LAST"
+          if [ "${{ steps.upstream.outputs.digest }}" = "$LAST" ] && [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Log in to GHCR
+        if: steps.compare.outputs.changed == 'true'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push image
+      - name: Build and push
+        if: steps.compare.outputs.changed == 'true'
         uses: docker/build-push-action@v6
         with:
           context: .
-          pull: true
           push: true
-          tags: ghcr.io/bigfug/hermes-agent-with-tools:latest
+          no-cache: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/hermes-agent-custom:latest
+            ghcr.io/${{ github.repository_owner }}/hermes-agent-custom:${{ github.run_number }}
+
+      - name: Save new digest
+        if: steps.compare.outputs.changed == 'true'
+        run: echo "${{ steps.upstream.outputs.digest }}" > .last-digest

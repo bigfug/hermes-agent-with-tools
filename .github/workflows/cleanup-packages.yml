@@ -1,0 +1,21 @@
+name: Clean up old Hermes image versions
+
+on:
+  schedule:
+    - cron: '30 7 * * 0' # weekly on Sunday at 07:30 UTC
+  workflow_dispatch: {}
+
+permissions:
+  packages: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Keep latest plus recent numbered images
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: hermes-agent-custom
+          package-type: container
+          min-versions-to-keep: 10
+          ignore-versions: '^latest$'

@@ -6,7 +6,6 @@ USER root
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         git-lfs \
-        python-yaml \
     && git lfs install --system \
     && rm -rf /var/lib/apt/lists/*
 
@@ -15,6 +14,7 @@ RUN /usr/local/bin/uv pip install \
     --python /opt/hermes/.venv/bin/python \
     ddgs \
     exa-py \
- && /opt/hermes/.venv/bin/python -c "import ddgs; import exa_py;  print('ddgs and exa_py installed OK')"
+    PyYAML \
+ && /opt/hermes/.venv/bin/python -c "import ddgs; import exa_py; import yaml; print('ddgs, exa_py and yaml installed OK')"
 
 USER hermes

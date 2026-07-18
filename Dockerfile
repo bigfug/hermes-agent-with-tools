@@ -14,7 +14,7 @@ RUN /usr/local/bin/uv pip install \
     --python /opt/hermes/.venv/bin/python \
     ddgs \
     PyYAML \
-    "mnemosyne-memory[all]" \
+    mnemosyne-hermes \
  && /opt/hermes/.venv/bin/python -c "import ddgs; import yaml; print('ddgs and yaml installed OK')"
 
 USER hermes

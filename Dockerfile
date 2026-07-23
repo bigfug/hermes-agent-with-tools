@@ -21,7 +21,8 @@ RUN uv pip install --python /usr/bin/python3 --break-system-packages \
     ddgs \
     PyYAML \
     mnemosyne-hermes \
- && /usr/bin/python3 -c "import ddgs; import yaml; import mnemosyne_hermes; print('all packages installed OK')"
+    pytest \
+ && /usr/bin/python3 -c "import ddgs; import yaml; import mnemosyne_hermes; import pytest; print('all packages installed OK')"
 
  
 # USER hermes

@@ -17,10 +17,11 @@ RUN apt-get update \
 #     mnemosyne-hermes \
 #  && /opt/hermes/.venv/bin/python -c "import ddgs; import yaml; print('ddgs and yaml installed OK')"
 
-RUN uv pip install --python /usr/bin/python3 \
+RUN uv pip install --python /usr/bin/python3 --break-system-packages \
     ddgs \
     PyYAML \
     mnemosyne-hermes \
  && /usr/bin/python3 -c "import ddgs; import yaml; import mnemosyne_hermes; print('all packages installed OK')"
+
  
 # USER hermes

@@ -10,11 +10,17 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python packages into Hermes' own venv
-RUN /usr/local/bin/uv pip install \
-    --python /opt/hermes/.venv/bin/python \
+# RUN /usr/local/bin/uv pip install \
+#     --python /opt/hermes/.venv/bin/python \
+#     ddgs \
+#     PyYAML \
+#     mnemosyne-hermes \
+#  && /opt/hermes/.venv/bin/python -c "import ddgs; import yaml; print('ddgs and yaml installed OK')"
+
+RUN uv pip install --python /usr/bin/python3 \
     ddgs \
     PyYAML \
     mnemosyne-hermes \
- && /opt/hermes/.venv/bin/python -c "import ddgs; import yaml; print('ddgs and yaml installed OK')"
-
-USER hermes
+ && /usr/bin/python3 -c "import ddgs; import yaml; import mnemosyne_hermes; print('all packages installed OK')"
+ 
+# USER hermes

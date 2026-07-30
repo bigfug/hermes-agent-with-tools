@@ -16,7 +16,7 @@ RUN /usr/local/bin/uv pip install \
     PyYAML \
     mnemosyne-hermes \
     pytest \
-    hindsight-all \
+    hindsight-client \
  && /opt/hermes/.venv/bin/python -c "import ddgs; import yaml; import mnemosyne_hermes; import pytest; print('all packages installed OK')"
 
 # RUN uv pip install --python /usr/bin/python3 --break-system-packages \
